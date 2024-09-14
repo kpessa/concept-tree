@@ -7,7 +7,6 @@
 		<div class="text-white font-bold text-xl">My App</div>
 		<ul class="flex space-x-4">
 			<li><a href="/" class="text-white hover:text-gray-300">Home</a></li>
-			<li><a href="/search" class="text-white hover:text-gray-300">Search</a></li>
 			<li><a href="/tree" class="text-white hover:text-gray-300">Tree Visualization</a></li>
 			<li><a href="/concepts" class="text-white hover:text-gray-300">Concept Table</a></li>
 		</ul>

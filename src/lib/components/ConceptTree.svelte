@@ -27,20 +27,16 @@
 
   onMount(() => {
     if (rootConcept) {
-      console.log(`ConceptTree: Building tree for root concept: ${rootConcept.CONCEPT_NAME}`);
       buildConceptTree(rootConcept.CONCEPT_NAME_KEY);
     }
   });
 
   $: if ($conceptTree && $conceptTree !== treeData) {
-    console.log(`ConceptTree: Received updated concept tree`);
     treeData = $conceptTree;
-    console.log('Tree structure:', JSON.stringify(treeData, null, 2));
     renderTree(treeData);
   }
 
   function renderTree(data: Concept) {
-    console.log(`ConceptTree: Starting to render tree`);
     if (!data) {
       error = 'No data available to render';
       isLoading = false;
@@ -84,7 +80,6 @@
     svg.call(zoom);
 
     updateTree = (source: d3.HierarchyNode<Concept>) => {
-      console.log(`ConceptTree: Updating tree visualization`);
       const treeData = treemap(root);
       const nodes = treeData.descendants();
       const links = treeData.links();
@@ -141,13 +136,11 @@
 
     // After initial render, update node sizes based on actual content
     setTimeout(() => {
-      console.log(`ConceptTree: Adjusting node sizes`);
       loadingStatus = 'Adjusting node sizes...';
       updateNodeSizes();
       updateTree(root);
       isLoading = false;
       loadingStatus = '';
-      console.log(`ConceptTree: Tree rendering complete`);
     }, 1000); // Increased timeout to allow more time for content to render
   }
 

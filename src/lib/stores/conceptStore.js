@@ -7,7 +7,7 @@ export const selectedConcept = writable(null);
 
 export async function loadConceptData() {
     try {
-        const response = await fetch('/data/concepts_ea.csv');
+        const response = await fetch('/data/concepts_3000.csv');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -48,13 +48,9 @@ export function buildConceptTree(rootId) {
             return;
         }
 
-        console.log(`Root concept found: ${rootConcept.CONCEPT_NAME}`);
-
         let processedNodes = new Set();
 
         function addChildren(node, depth = 0) {
-            console.log(`Processing node: ${node.CONCEPT_NAME} at depth ${depth}`);
-
             if (processedNodes.has(node.CONCEPT_NAME_KEY)) {
                 console.warn(`Circular reference detected for node: ${node.CONCEPT_NAME}`);
                 return;
@@ -63,24 +59,17 @@ export function buildConceptTree(rootId) {
             processedNodes.add(node.CONCEPT_NAME_KEY);
 
             const childrenReferences = (node.CONCEPT_RELTN || '').match(/\{([^}]+)\}/g) || [];
-            console.log(`CONCEPT_RELTN for ${node.CONCEPT_NAME}:`, node.CONCEPT_RELTN);
-            console.log(`Extracted references:`, childrenReferences);
-
             const children = childrenReferences.map(ref => {
                 const childName = ref.slice(1, -1); // Remove curly braces
                 const foundChild = concepts.find(c => 
                     c.CONCEPT_NAME === childName || c.CONCEPT_NAME_KEY === childName
                 );
-                console.log(`Looking for child: ${childName}, Found:`, foundChild ? foundChild.CONCEPT_NAME : 'Not found');
                 return foundChild;
             }).filter(Boolean);
-
-            console.log(`Found ${children.length} valid children for node: ${node.CONCEPT_NAME}`);
 
             node.children = children.map(child => {
                 const childNode = conceptMap.get(child.CONCEPT_NAME_KEY);
                 if (childNode) {
-                    console.log(`Adding child: ${childNode.CONCEPT_NAME} to parent: ${node.CONCEPT_NAME}`);
                     addChildren(childNode, depth + 1);
                     return childNode;
                 } else {
@@ -93,9 +82,6 @@ export function buildConceptTree(rootId) {
         }
 
         addChildren(rootConcept);
-        console.log('Finished building concept tree');
-        console.log('Tree structure:', JSON.stringify(rootConcept, null, 2));
-
         conceptTree.set(rootConcept);
         selectedConcept.set(rootConcept);
     });

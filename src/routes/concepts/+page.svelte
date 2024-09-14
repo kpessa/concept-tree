@@ -14,9 +14,6 @@
     isLoading = false;
   });
 
-  function handleConceptSelect(event: CustomEvent<Concept>) {
-    goto('/tree');
-  }
 </script>
 
 <h1>Concept Table</h1>
@@ -24,5 +21,5 @@
 {#if isLoading}
   <p>Loading concepts...</p>
 {:else}
-  <ConceptTable concepts={$conceptList} on:select={handleConceptSelect} />
+  <ConceptTable concepts={$conceptList}  />
 {/if}

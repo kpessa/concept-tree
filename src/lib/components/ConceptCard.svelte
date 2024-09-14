@@ -1,18 +1,26 @@
 <script lang="ts">
   import { Button } from '$lib/components/ui/button';
-  import { ChevronDown, ChevronUp } from 'lucide-svelte';
+  import { ChevronDown, ChevronUp, ChevronRight, ChevronLeft } from 'lucide-svelte';
   import { createEventDispatcher } from 'svelte';
 
   export let conceptData: Record<string, string | number>;
   export let mainFields: string[] = ['CONCEPT_DESC'];
   export let toggleChildren: () => void = () => {};
+  export let areChildrenExpanded: boolean = true;  // Add a default value
 
   let expanded = false;
-  
+
+  const dispatch = createEventDispatcher();
 
   function toggleExpand() {
     expanded = !expanded;
-    
+    dispatch('resize');
+  }
+
+  function handleToggleChildren() {
+    toggleChildren();
+    areChildrenExpanded = !areChildrenExpanded;  // Update the local state
+    dispatch('resize');
   }
 </script>
 
@@ -65,9 +73,15 @@
       {/if}
     </Button>
 
-    {#if conceptData.CONCEPT_TYPE_FLAG === 2}
-      <Button on:click={toggleChildren} variant="outline" class="ml-2">
-        Toggle Children
+    {#if conceptData.CONCEPT_TYPE_FLAG == 2}
+      <Button on:click={handleToggleChildren} variant="outline" class="ml-2">
+        {#if areChildrenExpanded}
+          <ChevronLeft class="mr-2 h-4 w-4" />
+          Collapse Children
+        {:else}
+          <ChevronRight class="mr-2 h-4 w-4" />
+          Expand Children
+        {/if}
       </Button>
     {/if}
   </div>
