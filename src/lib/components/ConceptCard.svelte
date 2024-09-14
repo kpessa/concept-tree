@@ -1,18 +1,22 @@
 <script lang="ts">
   import { Button } from '$lib/components/ui/button';
   import { ChevronDown, ChevronUp } from 'lucide-svelte';
+  import { createEventDispatcher } from 'svelte';
 
-  export let conceptData: Record<string, string>;
+  export let conceptData: Record<string, string | number>;
   export let mainFields: string[] = ['CONCEPT_DESC'];
+  export let toggleChildren: () => void = () => {};
 
   let expanded = false;
+  
 
   function toggleExpand() {
     expanded = !expanded;
+    
   }
 </script>
 
-<div class="concept-card border-2 border-gray-300 rounded-lg overflow-hidden max-w-2xl">
+<div class="concept-card border-2 border-gray-300 rounded-lg overflow-hidden max-w-2xl" style="transition: height 0.3s ease-in-out;">
   <div class="bg-gray-100 p-4 border-b-2 border-gray-300">
     <h2 class="text-lg font-bold">{conceptData.CONCEPT_NAME || conceptData.name}</h2>
     <p class="text-sm text-gray-600">{conceptData.CONCEPT_NAME_KEY || conceptData.key}</p>
@@ -50,7 +54,7 @@
     </div>
   {/if}
 
-  <div class="p-4 bg-gray-100 border-t-2 border-gray-300">
+  <div class="p-4 bg-gray-100 border-t-2 border-gray-300 flex justify-between">
     <Button on:click={toggleExpand} variant="outline" class="w-full">
       {#if expanded}
         <ChevronUp class="mr-2 h-4 w-4" />
@@ -60,12 +64,18 @@
         Show Details
       {/if}
     </Button>
+
+    {#if conceptData.CONCEPT_TYPE_FLAG === 2}
+      <Button on:click={toggleChildren} variant="outline" class="ml-2">
+        Toggle Children
+      </Button>
+    {/if}
   </div>
 </div>
 
 <style>
   .concept-card {
-    min-width: 300px; /* Set a minimum width */
-    min-height: 200px; /* Set a minimum height */
+    transition: height 0.3s ease-in-out;
+    background-color: white;
   }
 </style>
