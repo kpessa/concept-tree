@@ -39,10 +39,10 @@
         const height = 2000; // Increased height
         const margin = { top: 100, right: 120, bottom: 40, left: 120 };
 
-        const treemap = d3.tree().size([width - margin.left - margin.right, height - margin.top - margin.bottom]);
+        const treemap = d3.tree().size([height - margin.top - margin.bottom, width - margin.left - margin.right]);
 
         const root = d3.hierarchy(data);
-        root.x0 = width / 2;
+        root.x0 = height / 2;
         root.y0 = 0;
 
         svg = d3.select(treeContainer)
@@ -73,7 +73,8 @@
             const links = treeData.links();
 
             nodes.forEach((d) => {
-                d.y = d.depth * 400; // Increased vertical spacing
+                d.x = d.x + width / 2; // Center the nodes horizontally
+                d.y = d.depth * 200; // Adjust vertical spacing
             });
 
             const node = g.selectAll('g.node')
@@ -137,10 +138,10 @@
                 console.error('Invalid input to diagonal function:', { s, d });
                 return 'M0,0L0,0'; // Return a dummy path
             }
-            return `M ${s.x} ${s.y}
-                    C ${s.x} ${(s.y + d.y) / 2},
-                      ${d.x} ${(s.y + d.y) / 2},
-                      ${d.x} ${d.y}`;
+            return `M ${s.y} ${s.x}
+                    C ${(s.y + d.y) / 2} ${s.x},
+                      ${(s.y + d.y) / 2} ${d.x},
+                      ${d.y} ${d.x}`;
         }
 
         function click(d) {
@@ -157,27 +158,45 @@
     function renderConceptComponent(element, data) {
         const foreignObject = d3.select(element)
             .append('foreignObject')
-            .attr('width', 500) // Increased width
-            .attr('height', 350) // Increased height
-            .attr('x', -250) // Adjusted x position
-            .attr('y', -175); // Adjusted y position
+            .attr('width', 800) // Initial width
+            .attr('height', 600) // Initial height
+            .attr('x', -400) // Adjusted x position
+            .attr('y', -300); // Adjusted y position
 
         const div = foreignObject.append('xhtml:div')
             .style('width', '100%')
             .style('height', '100%')
             .style('overflow', 'hidden');
 
+        let component;
         if (data.CONCEPT_TYPE_FLAG === 1) {
-            new AtomicConcept({
+            component = new AtomicConcept({
                 target: div.node(),
                 props: { conceptData: data, mainFields: ['CONCEPT_DESC'] }
             });
         } else {
-            new ComplexConcept({
+            component = new ComplexConcept({
                 target: div.node(),
                 props: { conceptData: data, mainFields: ['CONCEPT_DESC', 'CONCEPT_RELTN'] }
             });
         }
+
+        // Use ResizeObserver to dynamically adjust the size of the foreignObject
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                const { width, height } = entry.contentRect;
+                foreignObject
+                    .attr('width', width + 20) // Add padding
+                    .attr('height', height + 20) // Add padding
+                    .attr('x', -400) // Keep original x position
+                    .attr('y', -300); // Keep original y position
+            }
+        });
+
+        resizeObserver.observe(div.node());
+
+        // Clean up the observer when the component is destroyed
+        return () => resizeObserver.disconnect();
     }
 
     function handleZoom(event) {
