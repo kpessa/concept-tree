@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { conceptData, loadConceptData } from '$lib/stores/conceptStore';
+  import { conceptList, buildConceptTree, loadConceptData, selectedConcept } from '$lib/stores/conceptStore';
   import type { Concept } from '$lib/types';
+  import { goto } from '$app/navigation';
 
   let searchTerm = '';
   let filteredConcepts: Concept[] = [];
@@ -9,8 +10,8 @@
   let isLoading = true;
 
   onMount(async () => {
-    if ($conceptData === null) {
-      console.log('ConceptData is null, loading data...');
+    if ($conceptList.length === 0) {
+      console.log('ConceptList is empty, loading data...');
       try {
         await loadConceptData();
         isLoading = false;
@@ -24,27 +25,25 @@
   });
 
   $: {
-    console.log('Current conceptData:', $conceptData);
-    if (searchTerm.length >= 2 && $conceptData) {
-      filteredConcepts = $conceptData.children.filter((concept: Concept) => 
+    if (searchTerm.length >= 2 && $conceptList) {
+      filteredConcepts = $conceptList.filter((concept: Concept) => 
         concept.CONCEPT_NAME_KEY.toLowerCase().includes(searchTerm.toLowerCase()) ||
         concept.CONCEPT_DESC.toLowerCase().includes(searchTerm.toLowerCase()) ||
         concept.CONCEPT_NAME.toLowerCase().includes(searchTerm.toLowerCase())
       );
       showDropdown = true;
-      console.log('Filtered concepts:', filteredConcepts);
     } else {
       showDropdown = false;
       filteredConcepts = [];
     }
-    console.log('Search term:', searchTerm);
-    console.log('Show dropdown:', showDropdown);
   }
 
   function selectConcept(concept: Concept) {
     searchTerm = concept.CONCEPT_NAME;
     showDropdown = false;
-    console.log('Selected concept:', concept);
+    selectedConcept.set(concept);
+    buildConceptTree(concept.CONCEPT_NAME_KEY);
+    goto('/tree');
   }
 </script>
 

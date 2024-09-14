@@ -1,7 +1,9 @@
 import { writable } from 'svelte/store';
 import * as d3 from 'd3';
 
-export const conceptData = writable(null);
+export const conceptList = writable([]);
+export const conceptTree = writable(null);
+export const selectedConcept = writable(null);
 
 export async function loadConceptData() {
     try {
@@ -17,54 +19,79 @@ export async function loadConceptData() {
         if (!rawData || rawData.length === 0) {
             throw new Error("Failed to parse CSV data");
         }
-        const processedData = processData(rawData);
-        if (!processedData) {
-            throw new Error("Failed to process data");
-        }
-        conceptData.set(processedData);
+        console.log('Loaded concepts:', rawData.length);
+        conceptList.set(rawData);
     } catch (error) {
         console.error('Error in loadConceptData:', error);
-        conceptData.set(null);
+        conceptList.set([]);
         throw error;
     }
 }
 
-function processData(rawData) {
-    const nodeMap = new Map();
-
-    // Create nodes
-    rawData.forEach(row => {
-        const node = {
-            ...row,
-            CONCEPT_TYPE_FLAG: parseInt(row.CONCEPT_TYPE_FLAG),
-            children: []
-        };
-        nodeMap.set(node.CONCEPT_NAME_KEY, node);
-        nodeMap.set(node.CONCEPT_NAME, node);
-    });
-
-    // Create hierarchy
-    nodeMap.forEach(node => {
-        if (node.CONCEPT_TYPE_FLAG === 2) { // Complex concept
-            const childKeys = extractRelatedConcepts(node.CONCEPT_RELTN);
-            node.children = childKeys
-                .map(key => nodeMap.get(key))
-                .filter(Boolean);
+export function buildConceptTree(rootId) {
+    console.log(`Starting to build concept tree with root ID: ${rootId}`);
+    conceptList.subscribe(concepts => {
+        if (concepts.length === 0) {
+            console.error('Concept list is empty. Load data first.');
+            return;
         }
+
+        console.log(`Total concepts in list: ${concepts.length}`);
+
+        const conceptMap = new Map(concepts.map(c => [c.CONCEPT_NAME_KEY, { ...c, children: [] }]));
+        console.log(`Concept map created with ${conceptMap.size} entries`);
+
+        const rootConcept = conceptMap.get(rootId);
+
+        if (!rootConcept) {
+            console.error(`Concept with ID ${rootId} not found.`);
+            return;
+        }
+
+        console.log(`Root concept found: ${rootConcept.CONCEPT_NAME}`);
+
+        let processedNodes = new Set();
+
+        function addChildren(node, depth = 0) {
+            console.log(`Processing node: ${node.CONCEPT_NAME} at depth ${depth}`);
+
+            if (processedNodes.has(node.CONCEPT_NAME_KEY)) {
+                console.warn(`Circular reference detected for node: ${node.CONCEPT_NAME}`);
+                return;
+            }
+
+            processedNodes.add(node.CONCEPT_NAME_KEY);
+
+            const childrenReferences = (node.CONCEPT_RELTN || '').match(/\{([^}]+)\}/g) || [];
+            const children = childrenReferences.map(ref => {
+                const childName = ref.slice(1, -1); // Remove curly braces
+                return concepts.find(c => 
+                    c.CONCEPT_NAME === childName || c.CONCEPT_NAME_KEY === childName
+                );
+            }).filter(Boolean);
+
+            console.log(`Found ${children.length} children for node: ${node.CONCEPT_NAME}`);
+
+            node.children = children.map(child => {
+                const childNode = conceptMap.get(child.CONCEPT_NAME_KEY);
+                if (childNode) {
+                    console.log(`Adding child: ${childNode.CONCEPT_NAME} to parent: ${node.CONCEPT_NAME}`);
+                    addChildren(childNode, depth + 1);
+                    return childNode;
+                } else {
+                    console.warn(`Child node not found in concept map: ${child.CONCEPT_NAME_KEY}`);
+                    return null;
+                }
+            }).filter(Boolean);
+
+            processedNodes.delete(node.CONCEPT_NAME_KEY);
+        }
+
+        addChildren(rootConcept);
+        console.log('Finished building concept tree');
+        console.log('Tree structure:', JSON.stringify(rootConcept, null, 2));
+
+        conceptTree.set(rootConcept);
+        selectedConcept.set(rootConcept);
     });
-
-    // Find the "EA - ToDo - Alert" concept
-    const rootNode = nodeMap.get("EATODOALERT") || nodeMap.get("EA - ToDo - Alert");
-
-    if (!rootNode) {
-        console.error("Root node 'EA - ToDo - Alert' not found");
-        return null;
-    }
-
-    console.log("Root node:", rootNode);
-    return rootNode;
-}
-
-function extractRelatedConcepts(expression) {
-    return expression.match(/\{(.*?)\}/g)?.map(key => key.replace(/[{}]/g, '')) || [];
 }

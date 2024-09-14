@@ -1,52 +1,62 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
+  import { onMount } from 'svelte';
   import * as d3 from 'd3';
-  import type { HierarchyNode } from 'd3-hierarchy';
-  import { conceptData, loadConceptData } from '$lib/stores/conceptStore';
+  import { conceptTree, buildConceptTree } from '$lib/stores/conceptStore';
+  import type { Concept } from '$lib/types';
   import ZoomControl from './ZoomControl.svelte';
   import AtomicConcept from './AtomicConcept.svelte';
   import ComplexConcept from './ComplexConcept.svelte';
 
+  export let rootConcept: Concept;
+
   let svg: d3.Selection<SVGSVGElement, unknown, null, undefined>;
-  let treeContainer: HTMLDivElement;
+  let treeContainer: HTMLElement;
   let error: string | null = null;
   let zoomLevel = 100;
-  let root: HierarchyNode<any>;
+  let root: d3.HierarchyNode<Concept>;
+  let isLoading = false;
+  let loadingStatus = '';
+  let treeData: Concept | null = null;
 
   const MIN_NODE_WIDTH = 400;
   const MIN_NODE_HEIGHT = 300;
   const MIN_HORIZONTAL_SPACING = 100;
   const MIN_VERTICAL_SPACING = 100;
 
-  let updateTree: (source: HierarchyNode<any>) => void;
+  let updateTree: (source: d3.HierarchyNode<Concept>) => void;
 
-  onMount(async () => {
-    try {
-      await loadConceptData();
-      if ($conceptData) {
-        console.log('Concept data loaded:', $conceptData);
-        await tick();
-        renderTree($conceptData);
-      } else {
-        error = 'No data available to render';
-      }
-    } catch (e) {
-      console.error('Error loading or processing data:', e);
-      error = `Error: ${e instanceof Error ? e.message : 'Unknown error'}. Check the console for more details.`;
+  onMount(() => {
+    if (rootConcept) {
+      console.log(`ConceptTree: Building tree for root concept: ${rootConcept.CONCEPT_NAME}`);
+      buildConceptTree(rootConcept.CONCEPT_NAME_KEY);
     }
   });
 
-  function renderTree(data: any) {
+  $: if ($conceptTree && $conceptTree !== treeData) {
+    console.log(`ConceptTree: Received updated concept tree`);
+    treeData = $conceptTree;
+    console.log('Tree structure:', JSON.stringify(treeData, null, 2));
+    renderTree(treeData);
+  }
+
+  function renderTree(data: Concept) {
+    console.log(`ConceptTree: Starting to render tree`);
     if (!data) {
       error = 'No data available to render';
+      isLoading = false;
       return;
+    }
+
+    // Clear previous tree if any
+    if (treeContainer) {
+      d3.select(treeContainer).selectAll('*').remove();
     }
 
     const width = 3000;
     const height = 2000;
     const margin = { top: 100, right: 120, bottom: 40, left: 120 };
 
-    const treemap = d3.tree<any>().nodeSize([MIN_NODE_WIDTH + MIN_HORIZONTAL_SPACING, MIN_NODE_HEIGHT + MIN_VERTICAL_SPACING]);
+    const treemap = d3.tree<Concept>().nodeSize([MIN_NODE_WIDTH + MIN_HORIZONTAL_SPACING, MIN_NODE_HEIGHT + MIN_VERTICAL_SPACING]);
 
     root = d3.hierarchy(data);
     root.x0 = width / 2;
@@ -66,61 +76,62 @@
     const zoom = d3
       .zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.1, 4])
-      .on('zoom', (event: d3.ZoomEvent<SVGSVGElement, unknown>) => {
+      .on('zoom', (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
         g.attr('transform', event.transform.toString());
         zoomLevel = Math.round(event.transform.k * 100);
       });
 
     svg.call(zoom);
 
-    updateTree = (source: HierarchyNode<any>) => {
+    updateTree = (source: d3.HierarchyNode<Concept>) => {
+      console.log(`ConceptTree: Updating tree visualization`);
       const treeData = treemap(root);
       const nodes = treeData.descendants();
       const links = treeData.links();
 
-      nodes.forEach((d: any) => {
+      nodes.forEach((d) => {
         d.y = d.depth * (MIN_NODE_HEIGHT + MIN_VERTICAL_SPACING);
       });
 
-      const node = g.selectAll<SVGGElement, HierarchyNode<any>>('g.node')
-        .data(nodes, (d: any) => d.data.CUST_CONCEPT_ID);
+      const node = g.selectAll<SVGGElement, d3.HierarchyNode<Concept>>('g.node')
+        .data(nodes, (d) => d.data.CONCEPT_NAME_KEY);
 
       const nodeEnter = node.enter()
         .append('g')
         .attr('class', 'node')
-        .attr('transform', (d: any) => `translate(${source.x0},${source.y0})`);
+        .attr('transform', (d) => `translate(${source.x0},${source.y0})`);
 
-      nodeEnter.each(function (this: Element, d: HierarchyNode<any>) {
+      nodeEnter.each(function (d) {
         renderConceptComponent(this, d);
       });
 
-      const nodeUpdate = nodeEnter.merge(node as any);
+      const nodeUpdate = nodeEnter.merge(node);
 
       nodeUpdate.transition()
         .duration(750)
-        .attr('transform', (d: any) => `translate(${d.x},${d.y})`);
+        .attr('transform', (d) => `translate(${d.x},${d.y})`);
 
       node.exit().remove();
 
-      const link = g.selectAll<SVGPathElement, d3.HierarchyLink<any>>('path.link')
-        .data(links, (d: any) => d.target.data.CUST_CONCEPT_ID);
+      const link = g.selectAll<SVGPathElement, d3.HierarchyLink<Concept>>('path.link')
+        .data(links, (d) => d.target.data.CONCEPT_NAME_KEY);
 
       const linkEnter = link.enter()
         .insert('path', 'g')
         .attr('class', 'link')
-        .attr('d', d3.linkVertical<any, any>()
-          .x((d: any) => d.x)
-          .y((d: any) => d.y));
+        .attr('d', d3.linkVertical<d3.HierarchyLink<Concept>, d3.HierarchyNode<Concept>>()
+          .x((d) => d.x)
+          .y((d) => d.y));
 
-      link.merge(linkEnter as any).transition()
+      link.merge(linkEnter).transition()
         .duration(750)
-        .attr('d', d3.linkVertical<any, any>()
-          .x((d: any) => d.x)
-          .y((d: any) => d.y));
+        .attr('d', d3.linkVertical<d3.HierarchyLink<Concept>, d3.HierarchyNode<Concept>>()
+          .x((d) => d.x)
+          .y((d) => d.y));
 
       link.exit().remove();
 
-      nodes.forEach((d: any) => {
+      nodes.forEach((d) => {
         d.x0 = d.x;
         d.y0 = d.y;
       });
@@ -130,17 +141,22 @@
 
     // After initial render, update node sizes based on actual content
     setTimeout(() => {
+      console.log(`ConceptTree: Adjusting node sizes`);
+      loadingStatus = 'Adjusting node sizes...';
       updateNodeSizes();
       updateTree(root);
+      isLoading = false;
+      loadingStatus = '';
+      console.log(`ConceptTree: Tree rendering complete`);
     }, 1000); // Increased timeout to allow more time for content to render
   }
 
   function updateNodeSizes() {
-    svg.selectAll('g.node').each(function(d: any) {
+    svg.selectAll('g.node').each(function(this: SVGGElement, d: d3.HierarchyNode<Concept>) {
       const foreignObject = d3.select(this).select('foreignObject');
       const div = foreignObject.select('div');
-      const contentHeight = div.node().scrollHeight;
-      const contentWidth = div.node().scrollWidth;
+      const contentHeight = div.node()?.scrollHeight || MIN_NODE_HEIGHT;
+      const contentWidth = div.node()?.scrollWidth || MIN_NODE_WIDTH;
 
       d.height = Math.max(contentHeight + 40, MIN_NODE_HEIGHT); // Add padding
       d.width = Math.max(contentWidth + 40, MIN_NODE_WIDTH); // Add padding
@@ -155,7 +171,7 @@
          .style('height', `${d.height}px`);
     });
 
-    const treemap = d3.tree<any>().nodeSize([
+    const treemap = d3.tree<Concept>().nodeSize([
       d3.max(root.descendants(), (d: any) => d.width) + MIN_HORIZONTAL_SPACING,
       d3.max(root.descendants(), (d: any) => d.height) + MIN_VERTICAL_SPACING
     ]);
@@ -163,7 +179,7 @@
     treemap(root);
   }
 
-  function toggleChildren(d: HierarchyNode<any>) {
+  function toggleChildren(d: d3.HierarchyNode<Concept>) {
     if (d.children) {
       d._children = d.children;
       d.children = null;
@@ -175,7 +191,7 @@
     setTimeout(updateNodeSizes, 100);
   }
 
-  function renderConceptComponent(element: Element, d: HierarchyNode<any>) {
+  function renderConceptComponent(element: Element, d: d3.HierarchyNode<Concept>) {
     const foreignObject = d3
       .select(element)
       .append('foreignObject')
@@ -191,7 +207,7 @@
       .style('overflow', 'auto');
 
     let component;
-    if (d.data.CONCEPT_TYPE_FLAG === 1) {
+    if (d.data.CONCEPT_TYPE_FLAG === '1') {
       component = new AtomicConcept({
         target: div.node(),
         props: { conceptData: d.data, mainFields: ['CONCEPT_DESC'] }
@@ -234,7 +250,12 @@
   <div class="zoom-control-container">
     <ZoomControl {zoomLevel} on:zoom={handleZoom} />
   </div>
-  {#if error}
+  {#if isLoading}
+    <div class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p>{loadingStatus}</p>
+    </div>
+  {:else if error}
     <p class="error">{error}</p>
   {:else}
     <div bind:this={treeContainer}></div>
@@ -254,7 +275,6 @@
     stroke: #ccc;
     stroke-width: 2px;
   }
-
   .node circle {
     fill: #fff;
     stroke: steelblue;
@@ -263,5 +283,30 @@
   .error {
     color: red;
     font-weight: bold;
+  }
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  .loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 </style>
