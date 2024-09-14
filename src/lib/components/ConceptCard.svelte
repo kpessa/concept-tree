@@ -1,78 +1,64 @@
-<script>
-  import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-    Input,
-    Label,
-    Select,
-    SelectTrigger,
-    SelectValue,
-    SelectContent,
-    SelectItem,
-    Textarea,
-    Checkbox
-  } from '$lib/components/ui';
+<script lang="ts">
+  import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui';
+  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "$lib/components/ui/table";
+  import { Button } from '$lib/components/ui/button';
+  import { ChevronDown, ChevronUp } from 'lucide-svelte';
 
-  let conceptType = "";
-  let conceptName = "";
-  let description = "";
-  let complexExpression = "";
-  let expireLookahead = "";
-  let expireOnDischarge = false;
-  let multiRow = false;
+  export let conceptData: Record<string, string>;
+  export let mainFields: string[];
 
-  
+  let expanded = false;
+
+  function toggleExpand() {
+    expanded = !expanded;
+  }
 </script>
 
-<Card class="w-[600px]">
+<Card>
   <CardHeader>
-    <CardTitle>Discern Prompt: Concept Builder</CardTitle>
+    <CardTitle>{conceptData.CONCEPT_NAME}</CardTitle>
   </CardHeader>
   <CardContent>
-    <form>
-      <div class="grid w-full items-center gap-4">
-        <div class="flex flex-col space-y-1.5">
-          <Label for="conceptType">Concept Type</Label>
-          <Select onSelectedChange={(event) => conceptType = event?.value}>
-            <SelectTrigger id="conceptType">
-              <SelectValue placeholder="Select concept type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Atomic">Atomic</SelectItem>
-              <SelectItem value="Complex">Complex</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div class="flex flex-col space-y-1.5">
-          <Label for="conceptName">Concept Name</Label>
-          <Input id="conceptName" bind:value={conceptName} />
-        </div>
-        <div class="flex flex-col space-y-1.5">
-          <Label for="description">Description</Label>
-          <Textarea id="description" bind:value={description} />
-        </div>
-        {#if conceptType === "Atomic"}
-          <div class="flex flex-col space-y-1.5">
-            <Label for="expireLookahead">Expire Lookahead</Label>
-            <Input id="expireLookahead" bind:value={expireLookahead} />
-          </div>
-          <div class="flex items-center space-x-2">
-            <Checkbox id="expireOnDischarge" bind:checked={expireOnDischarge} />
-            <Label for="expireOnDischarge">Expire on Discharge</Label>
-          </div>
-          <div class="flex items-center space-x-2">
-            <Checkbox id="multiRow" bind:checked={multiRow} />
-            <Label for="multiRow">Multi Row</Label>
-          </div>
-        {:else if conceptType === "Complex"}
-          <div class="flex flex-col space-y-1.5">
-            <Label for="complexExpression">Complex Expression</Label>
-            <Textarea id="complexExpression" bind:value={complexExpression} />
-          </div>
-        {/if}
-      </div>
-    </form>
+    <Table>
+      <TableBody>
+        {#each mainFields as field}
+          <TableRow>
+            <TableCell class="text-right font-bold text-sm text-gray-500">{field}</TableCell>
+            <TableCell>{conceptData[field]}</TableCell>
+          </TableRow>
+        {/each}
+      </TableBody>
+    </Table>
+    
+    {#if expanded}
+      <Table class="mt-4">
+        <TableHeader>
+          <TableRow>
+            <TableHead class="text-right">Field</TableHead>
+            <TableHead>Value</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {#each Object.entries(conceptData) as [key, value]}
+            {#if !mainFields.includes(key)}
+              <TableRow>
+                <TableCell class="text-right font-bold text-sm text-gray-500">{key}</TableCell>
+                <TableCell>{value}</TableCell>
+              </TableRow>
+            {/if}
+          {/each}
+        </TableBody>
+      </Table>
+    {/if}
+    
+    <Button on:click={toggleExpand} variant="outline" class="mt-4">
+      {#if expanded}
+        <ChevronUp class="mr-2 h-4 w-4" />
+        Hide Details
+      {:else}
+        <ChevronDown class="mr-2 h-4 w-4" />
+        Show Details
+      {/if}
+    </Button>
   </CardContent>
 </Card>
