@@ -63,14 +63,19 @@ export function buildConceptTree(rootId) {
             processedNodes.add(node.CONCEPT_NAME_KEY);
 
             const childrenReferences = (node.CONCEPT_RELTN || '').match(/\{([^}]+)\}/g) || [];
+            console.log(`CONCEPT_RELTN for ${node.CONCEPT_NAME}:`, node.CONCEPT_RELTN);
+            console.log(`Extracted references:`, childrenReferences);
+
             const children = childrenReferences.map(ref => {
                 const childName = ref.slice(1, -1); // Remove curly braces
-                return concepts.find(c => 
+                const foundChild = concepts.find(c => 
                     c.CONCEPT_NAME === childName || c.CONCEPT_NAME_KEY === childName
                 );
+                console.log(`Looking for child: ${childName}, Found:`, foundChild ? foundChild.CONCEPT_NAME : 'Not found');
+                return foundChild;
             }).filter(Boolean);
 
-            console.log(`Found ${children.length} children for node: ${node.CONCEPT_NAME}`);
+            console.log(`Found ${children.length} valid children for node: ${node.CONCEPT_NAME}`);
 
             node.children = children.map(child => {
                 const childNode = conceptMap.get(child.CONCEPT_NAME_KEY);
