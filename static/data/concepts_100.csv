@@ -1,0 +1,101 @@
+﻿CUST_CONCEPT_ID,CONCEPT_NAME,CONCEPT_NAME_KEY,CONCEPT_DESC,CONCEPT_TYPE_FLAG,CONCEPT_RELTN,EXPIRE_LOOKAHEAD,EXPIRE_ON_DISCHARGE,MULTIPLE_ENTRY_IND,UPDT_ID,UPDT_DT_TM,UPDT_CNT,UPDT_APPLCTX
+2278783,Active VAP Care Plan,ACTIVEVAPCAREPLAN,Patients with an active care plan for VAP,1,,,1,0,25619018,  12/02/14,0,2063369294
+5358117,Falls - Paticipative in Fall Prevention,FALLSPATICIPATIVEINFALLPREVENTION,Patients with a documented value whether or not they are participative in fall prevention,1,,,1,0,747930,  03/23/15,0,138717112
+5693614,Patients with PU and no care plan,PATIENTSWITHPUANDNOCAREPLAN,Patients with a documented pressure ulcer (based on wound type of pressure ulcer) OR at high risk of developing a pressure ulcer but without an appropriate care plan,2,({WOUNDSPRESENTONADMISSION}.COUNT > 0 OR {PUHIGHPURISK}) AND {ACTIVEPRESSUREULCERCAREPLAN}.COUNT = 0,,0,0,747930,  04/03/15,0,161471722
+5693976,Falls - High Risk or Documented Fall,FALLSHIGHRISKORDOCUMENTEDFALL,Patients with a High Fall Risk Score (based on Morse or Humpty) OR a documented fall,2,{FALLSHIGHFALLRISK} OR {DOCUMENTEDFALL}.COUNT > 0,,0,0,747930,  04/03/15,0,161471722
+5695903,Falls - High Fall Risk,FALLSHIGHFALLRISK,"Patients who are at high risk for falls (based on Morse, BH Edmondson or Humpty scores)",2,cnvtint({FALLRISKADULT}.VALUE) > 45 OR cnvtint({FALLRISKBHADULT}.VALUE) > 90 OR cnvtint({FALLRISKPEDS}.VALUE) > 12,,0,0,26977162,  07/19/23,3,644613849
+5695939,Vent and No Care Plan,VENTANDNOCAREPLAN,Patients with an a vent order or documentation and no VAP care plan initiated,2,{VENTS} AND {ACTIVEVAPCAREPLAN}.COUNT=0,,0,0,26977162,  04/17/20,1,1265105335
+5695987,Restraints - Doc with No Order,RESTRAINTSDOCWITHNOORDER,Patients with active documentation of restraint initiation but no active order,2,({RESTRAINTORDERNONVIOLENTRESTRAINTS}.COUNT = 0 AND {RESTRAINTORDERVIOLENTRESTRAINTS}.COUNT = 0) AND({DOCUMENTATIONOFRESTRAINTSNONVIOLENT}.COUNT > 0 OR {DOCUMENTATIONOFRESTRAINTSVIOLENT}.COUNT > 0),,0,0,747930,  04/03/15,0,161644179
+5696100,Restraints - Violent or Non Violent,RESTRAINTSVIOLENTORNONVIOLENT,Patient with an active order or documentation of either violent or non-violent restraints,2,{RESTRAINTSNONVIOLENT} OR {RESTRAINTSVIOLENT},,0,0,747930,  04/03/15,0,161644179
+5696289,Central Line Order - New,CENTRALLINEORDERNEW,Patients with an active PICC order OR an active Central Venous Catheter order OR Implanted Port order,2,{PICCORDER}.COUNT > 0 OR {IMPLANTEDPORTORDER}.COUNT > 0 OR {CVCORDER}.COUNT > 0,,0,0,26977162,  02/14/17,1,1515074383
+5696334,Urinary Cath - Order and No Doc,URINARYCATHORDERANDNODOC,Patients with an active order for a urinary catheter but no insertion documentation,2,{URINARYCATHETERORDER}.COUNT > 0 AND {URINARYCATHETERDOCUMENTED}.COUNT = 0,,0,0,747930,  04/03/15,0,161644179
+5696348,Urinary Cath and No Reason for Continuation,URINARYCATHANDNOREASONFORCONTINUATION,Patients with a Urinary Catheter (order or doc) without a reason foro continuation documented in the last 24 hours,2,{URINARYCATHORDERORDOC} AND {REASONFORCONTINUATIONURINARYCATHETER}.COUNT= 0,,0,0,30365432,  07/21/23,1,648844968
+5700701,Documented PU,DOCUMENTEDPU,Patients with a documented pressure ulcer,2,{DOCUMENTEDPRESSUREULCER}.COUNT > 0,,0,0,30025061,  01/21/20,4,871257296
+6835736,DKA,DKA,Patients that qualify for having DKA,2,{ACIDOSIS}.COUNT > 0 and {ANIONGAP}.COUNT > 0 and {BICARBONATE}.COUNT > 0,,0,0,24558401,  05/14/15,0,242832927
+6835740,Critical Care Insulin Infusion Protocol Order,CRITICALCAREINSULININFUSIONPROTOCOLORDER,This concept contains all patients that have the Critical Care Insulin Protocol. This is also used for TOC trigger.,1,,,1,0,24558401,  05/14/15,0,242832927
+6835808,Electrolyte TOC Tab,ELECTROLYTETOCTAB,Patients with an active electrolyte protocol.,2,({EAPROTOCOLMAGIV}.count + {EAPROTOCOLMAGORAL}.count + {EAPROTOCOLPOT}.count + {EAPROTOCOLPHOSIV}.count + {EAPROTOCOLPHOSORAL}.count) > 0,,0,0,31551005,  07/13/21,8,1273370314
+10157135,Corrected Sodium,CORRECTEDSODIUM,Corrected sodium for patients that are in DKA or HHS,1,,,1,0,24558401,  09/11/15,0,488883099
+10157160,Glucose,GLUCOSE,Patient that has a glucose result,1,,,1,0,24558401,  09/11/15,0,488883099
+10157246,DKA/HHS Phase 2,DKAHHSPHASE2,This is for patients that have had a phase 2 DKA/HHS order placed,1,,,1,0,24558401,  09/11/15,0,488883099
+10157264,DKA/HHS No Phase 2 Orders,DKAHHSNOPHASE2ORDERS,For patients with DKA/HHS order and no phase 2 orders,2,({DKAORDER}.COUNT > 0 OR {HHSORDER}.COUNT > 0) AND {DKAHHSPHASE1REDALERT}.COUNT = 0 AND {DKAHHSPHASE2}.COUNT = 0,,0,0,24558401,  09/11/15,0,488883099
+14032031,Speech Deficit,SPEECHDEFICIT,Patients that have documentation of a speech impairment or deficit,1,,,1,0,24558401,  01/22/16,0,750203350
+15037491,QM - SUB Cessation Med Inpatient,QMSUBCESSATIONMEDINPATIENT,Patients who have a Cessation medication as an inpatient order on this encounter.,1,,,1,0,28127306,  02/22/16,0,810412740
+15037531,QM - TOB Cessation Med Inpatient,QMTOBCESSATIONMEDINPATIENT,Patients who have a Cessation medication as an inpatient order on this encounter.,1,,,1,0,28127306,  02/22/16,0,810412740
+17382541,QM - VTE Patients at low risk for VTE,QMVTEPATIENTSATLOWRISKFORVTE,Patients who are at low risk for VTE,1,,,1,0,23353630,  04/26/16,1,939406456
+17417682,Blood Transfusion Order,BLOODTRANSFUSIONORDER,Patients that have an active order to transfuse blood,1,,,1,0,24558401,  04/27/16,0,941461428
+17788679,Preferred Language - Guardian Interpreter,PREFERREDLANGUAGEGUARDIANINTERPRETER,Patients with documentation of Parent/Guardian Preferred Lang Interpreter and a reference to the value that was documented,1,,,1,0,747930,  05/04/16,0,954322561
+17806850,Med Rec Pending Complete,MEDRECPENDINGCOMPLETE,Patients with pending medication reconciliations.,1,,,1,0,749931,  05/04/16,0,955010233
+17868636,QM - DCPlan - Estimated Length of Stay,QMDCPLANESTIMATEDLENGTHOFSTAY,Patients with a documented Estimated Length of Stay,1,,,1,0,23353630,  05/05/16,0,957241055
+17868648,QM - Inpatient Encounter Type,QMINPATIENTENCOUNTERTYPE,Patients whose most recent encounter type is Inpatient,1,,,1,0,23353630,  05/05/16,0,957241055
+17868682,QM - Observation Encounter Type,QMOBSERVATIONENCOUNTERTYPE,Patients whose most recent encounter type is Observation,1,,,1,0,23353630,  05/05/16,0,957241055
+18196759,QM - Antithrombotic Allergy,QMANTITHROMBOTICALLERGY,Patients who are allergic to antithrombotics,1,,,1,0,23353630,  05/11/16,0,967820632
+18215498,Allergy Change,ALLERGYCHANGE,Modification to patient's allergies.,1,,,1,0,749931,  05/11/16,0,968642903
+18251873,QM - VTE Patients with VTE Prophylaxis that is not GCS,QMVTEPATIENTSWITHVTEPROPHYLAXISTHATISNOTGCS,Patients that have an order for pharmacologic or mechnanical prophylaxis other than Graduated Compression Stockings,1,,,1,0,28127306,  05/12/16,0,969797469
+18251882,QM - VTE Patients with VTE Prophylaxis that is GCS,QMVTEPATIENTSWITHVTEPROPHYLAXISTHATISGCS,Patients that have an order for Graduated Compression Stockings,1,,,1,0,28127306,  05/12/16,0,969797469
+18251891,QM - VTE Patients with exclusion from the VTE-1 measure,QMVTEPATIENTSWITHEXCLUSIONFROMTHEVTE1MEASURE,Patients that have an exclusion or absolute contraindication to both mechanical and pharmacologic prophylaxis,1,,,1,0,28127306,  05/12/16,0,969797469
+18253335,QM - Assessed for Rehabilitation,QMASSESSEDFORREHABILITATION,Patients who have been assessed for Rehabilitation,1,,,1,0,28127306,  05/12/16,0,969797469
+18254428,QM - Afib Flutter,QMAFIBFLUTTER,Patients diagnosed with Atrial Fibrillation or Flutter,1,,,1,0,28127306,  05/12/16,0,969797469
+1842970,Active Activity Order,ACTIVEACTIVITYORDER,Patients with an active activity order,1,,,1,0,25619018,  11/25/14,0,0
+1842971,Active Diet Order,ACTIVEDIETORDER,Patients with an active diet order,1,,,1,0,25619018,  11/25/14,0,0
+1842972,Active NeoNatal Feeding Order,ACTIVENEONATALFEEDINGORDER,Patients with an active neonatal feeding order,1,,,1,0,25619018,  11/25/14,0,0
+1842973,Active Non-Violent Restraint Care Plan,ACTIVENONVIOLENTRESTRAINTCAREPLAN,Patients with an active care plan for non-violent restraints,1,,,1,0,25619018,  11/25/14,0,0
+1842974,Active Pressure Ulcer Care Plan,ACTIVEPRESSUREULCERCAREPLAN,Patients with an active care plan for pressure ulcer preventiion and management,1,,,1,0,25619018,  11/25/14,0,0
+1842975,Active Sitter Order,ACTIVESITTERORDER,Patients with an active order for a bedside sitter,1,,,1,0,25619018,  11/25/14,0,0
+1842976,Active Violent Restraint Care Plan,ACTIVEVIOLENTRESTRAINTCAREPLAN,Patients with an active care plan for violent restraints,1,,,1,0,25619018,  11/25/14,0,0
+1842977,Admission Med Rec,ADMISSIONMEDREC,Admission Med Rec,1,,,1,0,25619018,  11/25/14,0,0
+1842978,Central Line Care Plan,CENTRALLINECAREPLAN,Paitents with an active CLABSI care plan,1,,,1,0,25619018,  11/25/14,0,0
+1842979,Central Line Documented,CENTRALLINEDOCUMENTED,patients with active cenral line insertion documentation,1,,,1,1,25619018,  11/25/14,0,0
+1842980,Central Line Order,CENTRALLINEORDER,DELETE CONCEPT,1,,,0,1,26977162,  02/14/17,1,1515074383
+1842981,Creatinine Clearance greater than 30 DKA,CREATININECLEARANCEGREATERTHAN30DKA,Creatinine Clearance greater than 30 DKA,1,,,1,0,25619018,  11/25/14,0,0
+1842982,Creatinine Clearance less than 30 DKA,CREATININECLEARANCELESSTHAN30DKA,Creatinine Clearance less than 30 DKA,1,,,1,0,25619018,  11/25/14,0,0
+1842983,Creatinine greater 2.0 DKA,CREATININEGREATER20DKA,Creatinine greater 2.0 DKA,1,,,1,0,25619018,  11/25/14,0,0
+1842984,Creatinine less than 2.0 DKA,CREATININELESSTHAN20DKA,Creatinine less than 2.0 DKA,1,,,1,0,25619018,  11/25/14,0,0
+1842985,Discharge Request Order,DISCHARGEREQUESTORDER,Patients with an active order for a discharge request,1,,,1,0,25619018,  11/25/14,0,0
+1842986,Documentation of Restraints,DOCUMENTATIONOFRESTRAINTS,Patients with documentation of active restraints,1,,,1,0,25619018,  11/25/14,0,0
+1842987,Documented Fall,DOCUMENTEDFALL,Patients with a fall documented during the current encounter,1,,,1,0,25619018,  11/25/14,0,0
+1842988,Documented Fall Risk,DOCUMENTEDFALLRISK,Patient has a documented fall risk,1,,,1,0,25619018,  11/25/14,0,0
+1842989,Documented Pressure Ulcer,DOCUMENTEDPRESSUREULCER,Patient has a documented pressure ulcer,1,,,1,1,25619018,  11/25/14,0,0
+1842990,Documented Pressure Ulcer Risk,DOCUMENTEDPRESSUREULCERRISK,Patient has a documented pressure ulcer risk from Braden or Braden QD,1,,,1,0,38331720,  03/12/24,4,1271971370
+1842991,Documented SAD Risk - Adult,DOCUMENTEDSADRISKADULT,Patients with a documented moderate or high SAD risk score (adult),1,,,1,0,25619018,  11/25/14,0,0
+1842992,Fall Care Plan,FALLCAREPLAN,Patients with an active Fall Prevention and Management care plan,1,,,1,0,25619018,  11/25/14,0,0
+1842993,Isolation Order,ISOLATIONORDER,Patients with an active order for a discharge request,1,,,1,0,25619018,  11/25/14,0,0
+1842994,Meds by Hx,MEDSBYHX,Patients who have had Meds by History completed,1,,,1,0,25619018,  11/25/14,0,0
+1842995,Potassium Replacement,POTASSIUMREPLACEMENT,Patients with Potassium less than 3.3,1,,,1,0,25619018,  11/25/14,0,0
+1842996,Potassium Replacement above 5.0 DKA,POTASSIUMREPLACEMENTABOVE50DKA,Potassium Replacement above 5.0 DKA,1,,,1,0,25619018,  11/25/14,0,0
+1842997,Potassium Replacement between 3.3 and 5.0 DKA,POTASSIUMREPLACEMENTBETWEEN33AND50DKA,Potassium Replacement between 3.3 and 5.0 DKA,1,,,1,0,25619018,  11/25/14,0,0
+1842998,Potassium Replacement less than 3.3 DKA,POTASSIUMREPLACEMENTLESSTHAN33DKA,Patients with Potassium less than 3.3,1,,,0,0,25619018,  11/25/14,0,0
+1842999,Quality Measures Order,QUALITYMEASURESORDER,Patient has an active Quality Measures order,1,,,1,0,25619018,  11/25/14,0,0
+1843000,Readmission Risk,READMISSIONRISK,Patient has a documented moderate or high readmission risk score,1,,,1,0,25619018,  11/25/14,0,0
+1843001,Restraint Order,RESTRAINTORDER,Patients with an active order for restraints,1,,,1,0,25619018,  11/25/14,0,0
+1843002,Urinary Catheter Care Plan,URINARYCATHETERCAREPLAN,Patients with an active CAUTI care plan,1,,,1,0,25619018,  11/25/14,0,0
+1843003,Urinary Catheter Order,URINARYCATHETERORDER,Patients with an active order for an indwelling urinary catheter,1,,,1,0,25619018,  11/25/14,0,0
+1843004,Vent Order,VENTORDER,Patients with an active vent order,1,,,1,0,25619018,  11/25/14,0,0
+3932886,Anion Gap,ANIONGAP,Anion Gap greater than or equal to 12,1,,,1,0,25619018,  01/16/15,0,3353887
+5355894,Reason for Continuation - Central Line,REASONFORCONTINUATIONCENTRALLINE,Patients with a reason for continuing a central line charted within the last 24 hours.,1,,"24,H",1,1,26807360,  05/26/22,1,1096776595
+5357981,Vents - Daily Sedation Interruption,VENTSDAILYSEDATIONINTERRUPTION,Patients with a documented value for Daily Sedation Interruption in the VAP bundle,1,,"24,H",1,0,747930,  03/23/15,0,138717112
+5358001,CVC Order,CVCORDER,Patients with an active order for a Central Venous Catheter,1,,,1,1,28977274,  12/06/17,0,138717112
+5358091,Bed Alarm,BEDALARM,Patients with an active order for a bed alarm,1,,,1,0,747930,  03/23/15,0,138717112
+5693657,Staged PU and No Wound Care Order,STAGEDPUANDNOWOUNDCAREORDER,Patients with a documented pressure ulcer (based on wound type of pressure ulcer) that do not have an active wound care order,2,{WOUNDSPRESENTONADMISSION}.COUNT > 0 AND {WOUNDCAREORDER}.COUNT = 0,,0,0,747930,  04/03/15,0,161471722
+5696199,Central Line Order or Doc,CENTRALLINEORDERORDOC,Patients with an active central line order or documentation of a central line insertion,2,{CENTRALLINEORDERNEW} OR {CENTRALLINEDOCUMENTED}.COUNT > 0,,0,0,747930,  04/03/15,0,161644179
+5696375,Urinary Cath and No Needs Assessment,URINARYCATHANDNONEEDSASSESSMENT,Patients with a Urinary Catheter (order or doc) without a needs assessment performed in the last 24 hours,2,{URINARYCATHORDERORDOC} AND {URINARYCATHETERNEEDSASSESSMENT}.COUNT=0,,0,0,747930,  04/03/15,0,161644179
+5696556,No documentation of Admission Med Rec,NODOCUMENTATIONOFADMISSIONMEDREC,Patients who have not had Admission Med Rec completed,2,{ADMISSIONMEDREC}.COUNT = 0,,0,0,747930,  04/03/15,0,161644179
+5696618,Documented PU - Stage III,DOCUMENTEDPUSTAGEIII,Encounters with a documented pressure ulcer of stage III,2,"{DOCUMENTEDPRESSUREULCER}.VALUE = ""Stage III""",,0,0,747930,  01/08/18,1,80479433
+5696669,Documented PU - Stage I,DOCUMENTEDPUSTAGEI,Encounters with a documented pressure ulcer of stage I,2,"{DOCUMENTEDPRESSUREULCER}.VALUE = ""Stage I""",,0,0,747930,  01/08/18,1,80479433
+6835747,DKA Phase 2,DKAPHASE2,This is for patients that have had a phase 2 DKA order placed,1,,,1,0,24558401,  05/14/15,0,242832927
+10157206,HHS,HHS,Patients that qualify for having HHS,2,,,0,0,24558401,  09/11/15,0,488883099
+11168336,QM - Influenza Vaccine Ordered,QMINFLUENZAVACCINEORDERED,Patients who have an order for an Influenza Vaccine.,1,,,1,0,28127306,  10/15/15,0,560686855
+5355862,Urinary Catheter Documented,URINARYCATHETERDOCUMENTED,Patients with active urinary catheter insertion documentation,1,,,1,1,28977274,  02/15/19,1,138478316
+5355937,Urinary Catheter Needs Assessment,URINARYCATHETERNEEDSASSESSMENT,Patients with a Urinary Catheter Needs Assessment performed in the last 24 hours.,1,,"24,H",1,0,747930,  03/23/15,0,138478316
+5355946,Reason for Continuation - Urinary Catheter,REASONFORCONTINUATIONURINARYCATHETER,Patients with a reason for continuing a urinary catheter charted within the last 24 hours.,1,,"24,H",1,0,30365432,  08/09/23,1,695729854
+5355947,PICC Order,PICCORDER,Patients with an active PICC order,1,,,1,0,747930,  03/23/15,0,138478316
+5355967,Restraint Order - Violent Restraints,RESTRAINTORDERVIOLENTRESTRAINTS,Patients with an active order for violent restraints,1,,,1,0,747930,  03/23/15,0,138478316
+5355998,Documentation of Restraints - Non Violent,DOCUMENTATIONOFRESTRAINTSNONVIOLENT,Patients with documentation of initiation of non-violent restraints,1,,,1,0,747930,  03/23/15,0,138478316
+5357767,Vents - VTE Prophylaxis,VENTSVTEPROPHYLAXIS,Patients with a documented value for VTE Prophylaxis in the VAP bundle,1,,"24,H",1,0,747930,  03/23/15,0,138717112
+5357781,Vents - Patient Weaning Readiness,VENTSPATIENTWEANINGREADINESS,Patients with a documented result for Patient Ready to Wean,1,,"24,H",1,0,747930,  03/23/15,0,138717112
+5357797,Vents - Peptic Ulcer Prophylaxis,VENTSPEPTICULCERPROPHYLAXIS,Patients with a documented value for Peptic Ulcer Prophylaxis in the VAP bundle,1,,"24,H",1,0,747930,  03/23/15,0,138717112
+5357965,Vents - Oral Care,VENTSORALCARE,Patients with a documented value for Oral Care in the VAP bundle,1,,"24,H",1,0,747930,  03/23/15,0,138717112
+5693508,Central Line - Doc and No Order,CENTRALLINEDOCANDNOORDER,Patients with documentation of a central line insertion but no active order,2,{CENTRALLINEDOCUMENTED}.COUNT > 0 AND NOT {CENTRALLINEORDERNEW},,0,0,747930,  04/03/15,0,161471722
+5693860,PU - High Risk OR PU,PUHIGHRISKORPU,Patients who are at high risk of developing a pressure ulcer (braden <16 or a total Neonatal Skin Condition Score > 5) or have a documented wound (present or not present on admission).,2,{PUHIGHPURISK} OR {WOUNDSPRESENTONADMISSION}.COUNT > 0,,0,0,38331720,  03/12/24,2,1271971370
+5693947,Falls - High Risk and No Care Plan,FALLSHIGHRISKANDNOCAREPLAN,Patients who are at high risk for a fall (based on Morse or Humpty scores) or have had a fall documented in the current encounter and do not have an active fall risk care plan,2,{FALLSHIGHRISKORDOCUMENTEDFALL} AND {FALLCAREPLAN}.COUNT = 0,,0,0,747930,  04/03/15,0,161471722
+5695974,Restraints - Order With No Doc,RESTRAINTSORDERWITHNODOC,Patients with an active order for restraints (violent or non-violent) but no active documentation of restraint initiation,2,({RESTRAINTORDERNONVIOLENTRESTRAINTS}.COUNT > 0 OR {RESTRAINTORDERVIOLENTRESTRAINTS}.COUNT > 0) AND({DOCUMENTATIONOFRESTRAINTSNONVIOLENT}.COUNT=0 AND {DOCUMENTATIONOFRESTRAINTSVIOLENT}.COUNT=0),,0,0,747930,  04/03/15,0,161644179
+5696034,Restraints - Care Plan,RESTRAINTSCAREPLAN,Patient with an active restraints care plan (violent or non-violent),2,{ACTIVEVIOLENTRESTRAINTCAREPLAN}.COUNT > 0 OR {ACTIVENONVIOLENTRESTRAINTCAREPLAN}.COUNT > 0,,0,0,747930,  04/03/15,0,161644179

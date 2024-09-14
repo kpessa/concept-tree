@@ -1,10 +1,8 @@
 <script>
-  import ConceptCard from '$lib/components/ConceptCard.svelte';
-
-  function handleConceptSubmit(event) {
-    const conceptData = event.detail;
-    console.log(conceptData);
-  }
+  import AtomicConcept from '$lib/components/AtomicConcept.svelte';
 </script>
 
-<ConceptCard on:submit={handleConceptSubmit} />
+<main>
+  <h1>Atomic Concept Example</h1>
+  <AtomicConcept />
+</main>
