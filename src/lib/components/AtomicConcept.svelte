@@ -17,7 +17,7 @@
     UPDT_APPLCTX: "2063369294"
   };
 
-  const mainFields = ['CONCEPT_NAME_KEY', 'CONCEPT_DESC'];
+  const mainFields = ['CONCEPT_DESC'];
 </script>
 
 <ConceptCard {conceptData} {mainFields} />
