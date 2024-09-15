@@ -4,7 +4,7 @@
 
 <nav class="bg-gray-800 p-4">
 	<div class="container mx-auto flex justify-between items-center">
-		<div class="text-white font-bold text-xl">My App</div>
+		<div class="text-white font-bold text-xl">Concepts Web App</div>
 		<ul class="flex space-x-4">
 			<li><a href="/" class="text-white hover:text-gray-300">Home</a></li>
 			<li><a href="/tree" class="text-white hover:text-gray-300">Tree Visualization</a></li>

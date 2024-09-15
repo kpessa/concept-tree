@@ -4,6 +4,7 @@
   import { createEventDispatcher } from 'svelte';
   import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "$lib/components/ui/table";
   import { conceptList, buildConceptTree } from '$lib/stores/conceptStore';
+  import { Button } from "$lib/components/ui/button";
 
   export let concepts: Concept[] = [];
 
@@ -47,6 +48,15 @@
       : bValue.localeCompare(aValue);
   });
 
+  let currentPage = 1;
+  let itemsPerPage = 10;
+
+  $: totalPages = Math.ceil(filteredConcepts.length / itemsPerPage);
+  $: paginatedConcepts = sortedConcepts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   function handleSort(column: string) {
     if (sortColumn === column) {
       sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
@@ -80,6 +90,18 @@
     window.addEventListener('mousemove', resize);
     window.addEventListener('mouseup', stopResize);
   }
+
+  function nextPage() {
+    if (currentPage < totalPages) {
+      currentPage++;
+    }
+  }
+
+  function prevPage() {
+    if (currentPage > 1) {
+      currentPage--;
+    }
+  }
 </script>
 
 <div class="concept-table">
@@ -110,7 +132,7 @@
         </TableRow>
       </TableHeader>
       <TableBody>
-        {#each sortedConcepts as concept (concept.CONCEPT_NAME_KEY)}
+        {#each paginatedConcepts as concept (concept.CONCEPT_NAME_KEY)}
           <TableRow on:click={() => selectConcept(concept)} class="cursor-pointer">
             {#each Object.entries(concept) as [key, value]}
               <TableCell style="width: {columnWidths[key]}px; min-width: {columnWidths[key]}px;">{value}</TableCell>
@@ -120,12 +142,17 @@
       </TableBody>
     </Table>
   </div>
+
+  <div class="pagination">
+    <Button on:click={prevPage} disabled={currentPage === 1}>Previous</Button>
+    <span>{currentPage} of {totalPages}</span>
+    <Button on:click={nextPage} disabled={currentPage === totalPages}>Next</Button>
+  </div>
 </div>
 
 <style>
   .concept-table {
     width: 100%;
-    height: 80vh; /* Set a fixed height for the entire component */
     display: flex;
     flex-direction: column;
   }
@@ -133,8 +160,6 @@
   .table-container {
     flex-grow: 1;
     width: 100%;
-    overflow-x: scroll;
-    overflow-y: scroll;
     border: 2px solid #e2e8f0;
     border-radius: 0.5rem;
   }
@@ -203,5 +228,13 @@
 
   .resize-handle:hover {
     background-color: rgba(0, 102, 204, 0.3);
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
   }
 </style>

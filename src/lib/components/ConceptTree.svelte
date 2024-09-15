@@ -263,16 +263,12 @@
     transform: translateX(-50%);
     z-index: 10;
   }
-  .link {
+  :global(.link) {
     fill: none;
     stroke: #ccc;
     stroke-width: 2px;
   }
-  .node circle {
-    fill: #fff;
-    stroke: steelblue;
-    stroke-width: 3px;
-  }
+
   .error {
     color: red;
     font-weight: bold;

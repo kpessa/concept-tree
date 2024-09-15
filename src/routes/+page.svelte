@@ -5,10 +5,6 @@
 </script>
 
 <main>
-  <h1>Concept Examples</h1>
-  <h2>Atomic Concept</h2>
-  <AtomicConcept conceptData={{ /* your data here */ }} mainFields={['CONCEPT_DESC']} />
-  <h2 class="mt-8">Complex Concept</h2>
-  <ComplexConcept conceptData={{ /* your data here */ }} mainFields={['CONCEPT_DESC', 'CONCEPT_RELTN']} />
-  <!-- <ConceptBuilder /> -->
+  <h1>Concept Web App</h1>
+  
 </main>
