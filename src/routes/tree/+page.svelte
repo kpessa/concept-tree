@@ -9,7 +9,7 @@
 
     $: {
         if (!$selectedConcept) {
-            error = 'No concept selected. Please select a concept from the search or concept table.';
+            error = 'No concept selected. Please select a concept from the search.';
         } else {
             error = null;
         }
