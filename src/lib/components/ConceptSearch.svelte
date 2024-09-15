@@ -1,105 +1,115 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { conceptList, buildConceptTree, loadConceptData, selectedConcept } from '$lib/stores/conceptStore';
+  import { conceptList, selectedConcept } from '$lib/stores/conceptStore';
   import type { Concept } from '$lib/types';
-  import { goto } from '$app/navigation';
+  import { createEventDispatcher } from 'svelte';
 
   let searchTerm = '';
+  let isFocused = false;
   let filteredConcepts: Concept[] = [];
-  let showDropdown = false;
-  let isLoading = true;
-
-  onMount(async () => {
-    if ($conceptList.length === 0) {
-      console.log('ConceptList is empty, loading data...');
-      try {
-        await loadConceptData();
-        isLoading = false;
-      } catch (error) {
-        console.error('Failed to load concept data:', error);
-        isLoading = false;
-      }
-    } else {
-      isLoading = false;
-    }
-  });
+  const dispatch = createEventDispatcher();
 
   $: {
-    if (searchTerm.length >= 2 && $conceptList) {
-      filteredConcepts = $conceptList.filter((concept: Concept) => 
-        concept.CONCEPT_NAME_KEY.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        concept.CONCEPT_DESC.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    if (searchTerm && isFocused) {
+      filteredConcepts = $conceptList.filter(concept =>
         concept.CONCEPT_NAME.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      showDropdown = true;
+      ).slice(0, 10);
     } else {
-      showDropdown = false;
       filteredConcepts = [];
     }
   }
 
+  function handleInput() {
+    // No need to do anything here, the reactive statement will handle filtering
+  }
+
+  function handleFocus() {
+    isFocused = true;
+  }
+
+  function handleBlur() {
+    // Delay hiding the dropdown to allow for concept selection
+    setTimeout(() => {
+      isFocused = false;
+    }, 200);
+  }
+
   function selectConcept(concept: Concept) {
     searchTerm = concept.CONCEPT_NAME;
-    showDropdown = false;
     selectedConcept.set(concept);
-    buildConceptTree(concept.CONCEPT_NAME_KEY);
-    goto('/tree');
+    dispatch('select', concept);
+    isFocused = false;
+    filteredConcepts = [];
+    console.log("Concept selected:", concept.CONCEPT_NAME); // Add this log
   }
 </script>
 
-{#if isLoading}
-  <p>Loading concepts...</p>
-{:else}
-  <div class="concept-search">
-    <input
-      type="text"
-      bind:value={searchTerm}
-      placeholder="Search concepts..."
-    />
-    {#if showDropdown && filteredConcepts.length > 0}
-      <ul class="dropdown">
-        {#each filteredConcepts as concept (concept.CONCEPT_NAME_KEY)}
-          <li>
-            <button type="button" on:click={() => selectConcept(concept)} class="w-full text-left">
-              {concept.CONCEPT_NAME}
-            </button>
-          </li>
-        {/each}
-      </ul>
-    {:else if showDropdown}
-      <p>No matching concepts found</p>
-    {/if}
-  </div>
-{/if}
+<div class="concept-search">
+  <input
+    type="text"
+    bind:value={searchTerm}
+    on:input={handleInput}
+    on:blur={handleBlur}
+    on:focus={handleFocus}
+    placeholder="Search for a concept..."
+  />
+  {#if isFocused && filteredConcepts.length > 0}
+    <ul class="concept-list">
+      {#each filteredConcepts as concept}
+        <li>
+          <button type="button" on:click={() => selectConcept(concept)} class="w-full text-left">
+            {concept.CONCEPT_NAME}
+          </button>
+        </li>
+      {/each}
+    </ul>
+  {/if}
+</div>
 
 <style>
   .concept-search {
     position: relative;
+    width: 100%;
+    max-width: 400px;
   }
 
   input {
     width: 100%;
     padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
   }
 
-  .dropdown {
+  .concept-list {
     position: absolute;
-    width: 100%;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
     max-height: 200px;
     overflow-y: auto;
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    border: 1px solid #ccc;
-    background-color: white;
+    z-index: 10;
   }
 
-  .dropdown li {
+  li {
     padding: 8px;
     cursor: pointer;
   }
 
-  .dropdown li:hover {
+  li:hover {
     background-color: #f0f0f0;
+  }
+
+  button {
+    background: none;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    width: 100%;
   }
 </style>

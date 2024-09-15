@@ -30,59 +30,62 @@ export async function loadConceptData() {
 
 export function buildConceptTree(rootId) {
     console.log(`Starting to build concept tree with root ID: ${rootId}`);
-    conceptList.subscribe(concepts => {
-        if (concepts.length === 0) {
-            console.error('Concept list is empty. Load data first.');
+    let concepts;
+    conceptList.subscribe(value => {
+        concepts = value;
+    })();
+
+    if (concepts.length === 0) {
+        console.error('Concept list is empty. Load data first.');
+        return;
+    }
+
+    console.log(`Total concepts in list: ${concepts.length}`);
+
+    const conceptMap = new Map(concepts.map(c => [c.CONCEPT_NAME_KEY, { ...c, children: [] }]));
+
+    console.log(`Concept map created with ${conceptMap.size} entries`);
+
+    const rootConcept = conceptMap.get(rootId);
+
+    if (!rootConcept) {
+        console.error(`Concept with ID ${rootId} not found.`);
+        return;
+    }
+
+    let processedNodes = new Set();
+
+    function addChildren(node, depth = 0) {
+        if (processedNodes.has(node.CONCEPT_NAME_KEY)) {
+            console.warn(`Circular reference detected for node: ${node.CONCEPT_NAME}`);
             return;
         }
 
-        console.log(`Total concepts in list: ${concepts.length}`);
+        processedNodes.add(node.CONCEPT_NAME_KEY);
 
-        const conceptMap = new Map(concepts.map(c => [c.CONCEPT_NAME_KEY, { ...c, children: [] }]));
-        console.log(`Concept map created with ${conceptMap.size} entries`);
+        const childrenReferences = (node.CONCEPT_RELTN || '').match(/\{([^}]+)\}/g) || [];
+        const children = childrenReferences.map(ref => {
+            const childName = ref.slice(1, -1); // Remove curly braces
+            const foundChild = concepts.find(c => 
+                c.CONCEPT_NAME === childName || c.CONCEPT_NAME_KEY === childName
+            );
+            return foundChild;
+        }).filter(Boolean);
 
-        const rootConcept = conceptMap.get(rootId);
-
-        if (!rootConcept) {
-            console.error(`Concept with ID ${rootId} not found.`);
-            return;
-        }
-
-        let processedNodes = new Set();
-
-        function addChildren(node, depth = 0) {
-            if (processedNodes.has(node.CONCEPT_NAME_KEY)) {
-                console.warn(`Circular reference detected for node: ${node.CONCEPT_NAME}`);
-                return;
+        node.children = children.map(child => {
+            const childNode = conceptMap.get(child.CONCEPT_NAME_KEY);
+            if (childNode) {
+                addChildren(childNode, depth + 1);
+                return childNode;
+            } else {
+                console.warn(`Child node not found in concept map: ${child.CONCEPT_NAME_KEY}`);
+                return null;
             }
+        }).filter(Boolean);
 
-            processedNodes.add(node.CONCEPT_NAME_KEY);
+        processedNodes.delete(node.CONCEPT_NAME_KEY);
+    }
 
-            const childrenReferences = (node.CONCEPT_RELTN || '').match(/\{([^}]+)\}/g) || [];
-            const children = childrenReferences.map(ref => {
-                const childName = ref.slice(1, -1); // Remove curly braces
-                const foundChild = concepts.find(c => 
-                    c.CONCEPT_NAME === childName || c.CONCEPT_NAME_KEY === childName
-                );
-                return foundChild;
-            }).filter(Boolean);
-
-            node.children = children.map(child => {
-                const childNode = conceptMap.get(child.CONCEPT_NAME_KEY);
-                if (childNode) {
-                    addChildren(childNode, depth + 1);
-                    return childNode;
-                } else {
-                    console.warn(`Child node not found in concept map: ${child.CONCEPT_NAME_KEY}`);
-                    return null;
-                }
-            }).filter(Boolean);
-
-            processedNodes.delete(node.CONCEPT_NAME_KEY);
-        }
-
-        addChildren(rootConcept);
-        conceptTree.set(rootConcept);
-        selectedConcept.set(rootConcept);
-    });
+    addChildren(rootConcept);
+    conceptTree.set(rootConcept);
 }

@@ -6,7 +6,8 @@
   export let conceptData: Record<string, string | number>;
   export let mainFields: string[] = ['CONCEPT_DESC'];
   export let toggleChildren: () => void = () => {};
-  export let areChildrenExpanded: boolean = true;  // Add a default value
+  export let areChildrenExpanded: boolean = true;
+  export let width: number = 400; // Explicitly declare width prop with a default value
 
   let expanded = false;
 
@@ -24,7 +25,7 @@
   }
 </script>
 
-<div class="concept-card border-2 border-gray-300 rounded-lg overflow-hidden max-w-2xl" style="transition: height 0.3s ease-in-out;">
+<div class="concept-card border-2 border-gray-300 rounded-lg overflow-hidden" style="width: {width}px; transition: height 0.3s ease-in-out;">
   <div class="bg-gray-100 p-4 border-b-2 border-gray-300">
     <h2 class="text-lg font-bold">{conceptData.CONCEPT_NAME || conceptData.name}</h2>
     <p class="text-sm text-gray-600">{conceptData.CONCEPT_NAME_KEY || conceptData.key}</p>
@@ -91,5 +92,6 @@
   .concept-card {
     transition: height 0.3s ease-in-out;
     background-color: white;
+    max-width: 100%;
   }
 </style>

@@ -17,14 +17,6 @@
       const newZoom = parseInt((event.target as HTMLInputElement).value);
       dispatch('zoom', { level: newZoom });
     }
-  
-    $: {
-      // Update the slider when zoomLevel changes externally
-      const slider = document.querySelector('input[type="range"]') as HTMLInputElement;
-      if (slider) {
-        slider.value = zoomLevel.toString();
-      }
-    }
 </script>
   
 <div class="zoom-control">
@@ -33,7 +25,7 @@
       type="range" 
       min="10" 
       max="400" 
-      {zoomLevel}
+      value={zoomLevel}
       on:input={handleSliderChange}
     />
     <button on:click={increaseZoom}>+</button>
