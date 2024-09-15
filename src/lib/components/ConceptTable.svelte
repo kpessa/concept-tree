@@ -119,9 +119,9 @@
           {#each Object.keys(concepts[0] || {}) as column}
             <TableHead style="width: {columnWidths[column]}px; min-width: {columnWidths[column]}px; position: relative;">
               <div class="flex justify-between items-center">
-                <span on:click={() => handleSort(column)} class="cursor-pointer">
+                <button type="button" on:click={() => handleSort(column)} class="text-left">
                   {column} {sortColumn === column ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                </span>
+                </button>
                 <div
                   class="resize-handle"
                   on:mousedown={(e) => startResize(e, column)}

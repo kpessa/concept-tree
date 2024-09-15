@@ -59,8 +59,10 @@
     {#if showDropdown && filteredConcepts.length > 0}
       <ul class="dropdown">
         {#each filteredConcepts as concept (concept.CONCEPT_NAME_KEY)}
-          <li on:click={() => selectConcept(concept)}>
-            {concept.CONCEPT_NAME}
+          <li>
+            <button type="button" on:click={() => selectConcept(concept)} class="w-full text-left">
+              {concept.CONCEPT_NAME}
+            </button>
           </li>
         {/each}
       </ul>
