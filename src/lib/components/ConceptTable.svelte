@@ -122,10 +122,18 @@
                 <button type="button" on:click={() => handleSort(column)} class="text-left">
                   {column} {sortColumn === column ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
                 </button>
-                <div
+                <button
+                  type="button"
                   class="resize-handle"
+                  aria-label="Resize column"
                   on:mousedown={(e) => startResize(e, column)}
-                ></div>
+                  on:keydown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      startResize(e, column);
+                    }
+                  }}
+                ></button>
               </div>
             </TableHead>
           {/each}
@@ -222,6 +230,9 @@
     right: 0;
     top: 0;
     cursor: col-resize;
+    background: transparent;
+    border: none;
+    padding: 0;
     user-select: none;
     z-index: 1;
   }
