@@ -10,6 +10,7 @@
 			<li><a href="/csv-processor" class="text-white hover:text-gray-300">Data Import</a></li>
 			<li><a href="/tree" class="text-white hover:text-gray-300">Tree Visualization</a></li>
 			<li><a href="/concepts" class="text-white hover:text-gray-300">Concept Table</a></li>
+			<li><a href="/concept-examples" class="text-white hover:text-gray-300">Concept Examples</a></li>
 		</ul>
 	</div>
 </nav>

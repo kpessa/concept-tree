@@ -11,7 +11,9 @@
   $: {
     if (searchTerm && isFocused) {
       filteredConcepts = $conceptList.filter(concept =>
-        concept.CONCEPT_NAME.toLowerCase().includes(searchTerm.toLowerCase())
+        (concept.CONCEPT_ID && concept.CONCEPT_ID.includes(searchTerm.toLowerCase())) ||
+        (concept.CONCEPT_NAME && concept.CONCEPT_NAME.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (concept.CONCEPT_NAME_KEY && concept.CONCEPT_NAME_KEY.toLowerCase().includes(searchTerm.toLowerCase()))
       ).slice(0, 10);
     } else {
       filteredConcepts = [];
@@ -57,7 +59,11 @@
       {#each filteredConcepts as concept}
         <li>
           <button type="button" on:click={() => selectConcept(concept)} class="w-full text-left">
-            {concept.CONCEPT_NAME}
+            <strong>{concept.CONCEPT_NAME ?? 'Unnamed Concept'}</strong>
+            <br>
+            <small>ID: {concept.CONCEPT_ID ?? 'N/A'} | Key: {concept.CONCEPT_KEY ?? 'N/A'}</small>
+            <br>
+            <small>{concept.CONCEPT_DESC ?? 'No description available'}</small>
           </button>
         </li>
       {/each}
@@ -96,10 +102,11 @@
   li {
     padding: 8px;
     cursor: pointer;
+    border-bottom: 1px solid #eee;
   }
 
-  li:hover {
-    background-color: #f0f0f0;
+  li:last-child {
+    border-bottom: none;
   }
 
   button {
@@ -111,5 +118,12 @@
     margin: 0;
     text-align: left;
     width: 100%;
+    display: block;
+  }
+
+  small {
+    display: block;
+    color: #666;
+    font-size: 0.8em;
   }
 </style>
