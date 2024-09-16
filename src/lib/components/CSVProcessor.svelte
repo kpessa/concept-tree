@@ -5,12 +5,20 @@
   import { ToggleGroup, ToggleGroupItem } from "$lib/components/ui/toggle-group";
   import { toast } from "svelte-sonner";
   import Papa from 'papaparse';
-  import { conceptList } from '$lib/stores/conceptStore';
+  import { conceptList, updateConcepts } from '$lib/stores/conceptStore';
 
   let file: File | null = null;
   let csvText = '';
   let concepts: any[] = [];
   let inputMode: 'file' | 'text' = 'file';
+  let processingResult = {
+    previousTotal: 0,
+    added: 0,
+    updated: 0,
+    unchanged: 0,
+    atomic: 0,
+    complex: 0
+  };
 
   function handleFileSelect(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -24,10 +32,7 @@
     const parseConfig = {
       complete: (results) => {
         concepts = results.data;
-        conceptList.set(concepts); // Update the store
-        toast.success("CSV Processed", {
-          description: `${concepts.length} concepts were processed.`,
-        });
+        processConceptsAndUpdateStore(concepts);
       },
       header: true,
     };
@@ -37,6 +42,61 @@
     } else {
       Papa.parse(input, parseConfig);
     }
+  }
+
+  function processConceptsAndUpdateStore(newConcepts) {
+    conceptList.update(currentConcepts => {
+      processingResult = {
+        previousTotal: currentConcepts.length,
+        added: 0,
+        updated: 0,
+        unchanged: 0,
+        atomic: 0,
+        complex: 0
+      };
+
+      const updatedConcepts = [...currentConcepts];
+
+      newConcepts.forEach(newConcept => {
+        const index = updatedConcepts.findIndex(c => c.CONCEPT_NAME_KEY === newConcept.CONCEPT_NAME_KEY);
+        if (index !== -1) {
+          if (JSON.stringify(updatedConcepts[index]) !== JSON.stringify(newConcept)) {
+            updatedConcepts[index] = { ...updatedConcepts[index], ...newConcept };
+            processingResult.updated++;
+          } else {
+            processingResult.unchanged++;
+          }
+        } else {
+          updatedConcepts.push(newConcept);
+          processingResult.added++;
+        }
+
+        if (newConcept.CONCEPT_TYPE_FLAG == 1) {
+          processingResult.atomic++;
+        } else if (newConcept.CONCEPT_TYPE_FLAG == 2) {
+          processingResult.complex++;
+        }
+      });
+
+      showProcessingResult();
+      return updatedConcepts;
+    });
+  }
+
+  function showProcessingResult() {
+    const { previousTotal, added, updated, unchanged, atomic, complex } = processingResult;
+    const total = added + updated + unchanged;
+    const newTotal = previousTotal + added;
+    
+    toast.success("CSV Processed", {
+      description: `
+        Previous total: ${previousTotal}
+        New total: ${newTotal}
+        Added: ${added}
+        Updated: ${updated}
+      `,
+      duration: 5000,
+    });
   }
 
   function handleTextInput() {
@@ -75,11 +135,30 @@
   {/if}
 
   {#if concepts.length > 0}
-    <div class="mt-4">
-      <h3 class="text-lg font-semibold mb-2">Processed Concepts Summary:</h3>
-      <p>Total concepts processed: {concepts.length}</p>
-      <p>Atomic concepts: {concepts.filter(c => c.CONCEPT_TYPE_FLAG == 1).length}</p>
-      <p>Complex concepts: {concepts.filter(c => c.CONCEPT_TYPE_FLAG == 2).length}</p>
+    <div class="mt-4 space-y-4">
+      <h3 class="text-lg font-semibold">Processed Concepts Summary:</h3>
+      
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-gray-100 p-4 rounded-md">
+          <h4 class="font-semibold mb-2">Concept Counts</h4>
+          <p>Previous total: {processingResult.previousTotal}</p>
+          <p>New total: {processingResult.previousTotal + processingResult.added}</p>
+          <p>Processed in this import: {concepts.length}</p>
+        </div>
+        
+        <div class="bg-gray-100 p-4 rounded-md">
+          <h4 class="font-semibold mb-2">Import Results</h4>
+          <p>Added: {processingResult.added}</p>
+          <p>Updated: {processingResult.updated}</p>
+          <p>Unchanged: {processingResult.unchanged}</p>
+        </div>
+        
+        <div class="bg-gray-100 p-4 rounded-md">
+          <h4 class="font-semibold mb-2">Concept Types</h4>
+          <p>Atomic concepts: {processingResult.atomic}</p>
+          <p>Complex concepts: {processingResult.complex}</p>
+        </div>
+      </div>
     </div>
   {/if}
 </div>

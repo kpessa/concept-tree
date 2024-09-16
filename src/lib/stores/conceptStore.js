@@ -28,6 +28,30 @@ export async function loadConceptData() {
     }
 }
 
+export function updateConcepts(newConcepts) {
+    conceptList.update(currentConcepts => {
+        const updatedConcepts = [...currentConcepts];
+        const addedConcepts = [];
+        const updatedConceptIds = [];
+
+        newConcepts.forEach(newConcept => {
+            const index = updatedConcepts.findIndex(c => c.CONCEPT_NAME_KEY === newConcept.CONCEPT_NAME_KEY);
+            if (index !== -1) {
+                if (JSON.stringify(updatedConcepts[index]) !== JSON.stringify(newConcept)) {
+                    updatedConcepts[index] = { ...updatedConcepts[index], ...newConcept };
+                    updatedConceptIds.push(newConcept.CONCEPT_NAME_KEY);
+                }
+            } else {
+                updatedConcepts.push(newConcept);
+                addedConcepts.push(newConcept.CONCEPT_NAME_KEY);
+            }
+        });
+
+        console.log(`Updated ${updatedConceptIds.length} concepts and added ${addedConcepts.length} new concepts.`);
+        return updatedConcepts;
+    });
+}
+
 export function buildConceptTree(rootId) {
     console.log(`Starting to build concept tree with root ID: ${rootId}`);
     let concepts;
