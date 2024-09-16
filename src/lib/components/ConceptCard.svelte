@@ -124,8 +124,8 @@
 
   :global(.concept-type-badge) {
     position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
+    top: 0.2rem;
+    right: 0.2rem;
     z-index: 10;
   }
 
