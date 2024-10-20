@@ -8,5 +8,8 @@ export default defineConfig({
 		alias: {
 			$lib: path.resolve('./src/lib')
 		}
+	},
+	optimizeDeps: {
+		include: ['monaco-editor/esm/vs/editor/editor.api']
 	}
 });
