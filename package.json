@@ -39,9 +39,11 @@
 		"clsx": "^2.1.1",
 		"d3": "^7.9.0",
 		"lucide-svelte": "^0.441.0",
+		"monaco-editor": "^0.34.0",
 		"papaparse": "^5.4.1",
 		"prismjs": "^1.29.0",
 		"shadcn-ui": "^0.9.1",
+		"svelte-monaco": "^1.2.0",
 		"svelte-sonner": "^0.3.28",
 		"tailwind-merge": "^2.5.2",
 		"tailwind-variants": "^0.2.1"
