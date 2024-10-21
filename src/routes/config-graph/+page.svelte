@@ -14,14 +14,18 @@
   });
 </script>
 
-<main>
-  <h1>Config Graph</h1>
-  {#if treeData}
+<svelte:head>
+  <title>Config Graph</title>
+</svelte:head>
+
+<h1 class="text-2xl font-semibold mb-4">Config Graph</h1>
+{#if treeData}
+  <div class="h-[calc(100vh-120px)]">
     <TreeGraph {treeData} />
-  {:else}
-    <p>Loading config data...</p>
-  {/if}
-</main>
+  </div>
+{:else}
+  <p>Loading config data...</p>
+{/if}
 
 <style>
   main {

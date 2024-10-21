@@ -8,5 +8,9 @@
   });
 </script>
 
-<h1 class="text-2xl font-bold mb-4">Configuration Import</h1>
+<svelte:head>
+  <title>Config Import</title>
+</svelte:head>
+
+<h1 class="text-2xl font-semibold mb-4">Configuration Import</h1>
 <JSONImporter />
