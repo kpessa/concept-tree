@@ -4,10 +4,11 @@
 
 <nav class="bg-gray-800 p-4">
 	<div class="container mx-auto flex justify-between items-center">
-		<div class="text-white font-bold text-xl">Concepts Web App</div>
+		<div class="text-white font-bold text-xl">Concepts/Config Web App</div>
 		<ul class="flex space-x-4">
 			<li><a href="/" class="text-white hover:text-gray-300">Home</a></li>
-			<li><a href="/csv-processor" class="text-white hover:text-gray-300">Data Import</a></li>
+			<li><a href="/config-graph" class="text-white hover:text-gray-300">Config Graph</a></li>
+			<li><a href="/csv-processor" class="text-white hover:text-gray-300">Concepts Import</a></li>
 			<li><a href="/config-import" class="text-white hover:text-gray-300">Config Import</a></li>
 			<li><a href="/tree" class="text-white hover:text-gray-300">Tree Visualization</a></li>
 			<li><a href="/concepts" class="text-white hover:text-gray-300">Concept Table</a></li>
@@ -19,3 +20,6 @@
 <main class="container mx-auto mt-8">
 	<slot />
 </main>
+
+<style>
+</style>

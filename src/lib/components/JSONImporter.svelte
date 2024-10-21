@@ -6,11 +6,10 @@
   import { toast } from "svelte-sonner";
   import { configStore, updateConfig } from '$lib/stores/configStore';
   import Monaco from 'svelte-monaco';
-  import * as monaco from 'monaco-editor';
 
   let file: File | null = null;
   let inputMode: 'file' | 'text' = 'file';
-  let editor: monaco.editor.IStandaloneCodeEditor | null = null;
+  let editor: any = null;
   let editorContent = '';
 
   $: editorContent = JSON.stringify($configStore, null, 2);
@@ -61,7 +60,7 @@
     if (fileInput) fileInput.click();
   }
 
-  function handleEditorInit(e: CustomEvent<{ editor: monaco.editor.IStandaloneCodeEditor }>) {
+  function handleEditorInit(e: CustomEvent<{ editor: any }>) {
     editor = e.detail.editor;
     editor.setValue(editorContent);
   }
